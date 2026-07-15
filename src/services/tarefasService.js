@@ -1,4 +1,4 @@
-import { lerTarefas } from "../repositories/tarefasRepository.js";
+import { lerTarefas, salvarTarefas } from "../repositories/tarefasRepository.js";
 
 function listarTarefasService() {
     const tarefas = lerTarefas();
@@ -48,8 +48,107 @@ function buscarTarefaPorIdService(id) {
     }
 }
 
+function cadastrarTarefaService(dados) {
+
+    const { titulo, descricao, prioridade } = dados;
+
+    if(typeof titulo !== "string" ||  typeof prioridade !== "string") {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Dados inválidos"
+        }
+    }
+
+    const descricaoEnviada = typeof descricao !== "undefined";
+
+    if(descricaoEnviada && typeof descricao !== "string") {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Descrição inválida"
+        };
+    }
+    
+
+    const tituloNormalizado = titulo.trim();
+
+    let descricaoNormalizada;
+
+    const prioridadeNormalizada = prioridade.trim().toLowerCase();
+
+    
+    if(tituloNormalizado === "") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "Campo titulo vazio"
+            }
+    }
+
+    if(descricaoEnviada){
+        descricaoNormalizada = descricao.trim();
+    }else{
+         descricaoNormalizada = "";
+    }
+
+    if(prioridadeNormalizada === "") {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Campo prioridade vazio"
+        }
+    }
+
+    if(prioridadeNormalizada !== "baixa" &&  prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Tipo de prioridade inválida"
+        }
+    }
+
+    const tarefas = lerTarefas();
+
+
+    let maiorId = 0;
+
+    tarefas.forEach(tarefa => {
+        if (tarefa.id > maiorId) {
+            maiorId = tarefa.id;
+        }
+    });
+
+
+    const proximoId = maiorId + 1;
+
+    const concluida = false;
+
+    const dataDeCriacao = new Date().toISOString();
+
+    const novaTarefa = {
+        id: proximoId,
+        titulo: tituloNormalizado,
+        descricao: descricaoNormalizada,
+        prioridade: prioridadeNormalizada,
+        concluida: concluida,
+        criadoEm: dataDeCriacao
+    }
+
+    tarefas.push(novaTarefa);
+
+    salvarTarefas(tarefas);
+
+    return {
+        sucesso: true,
+        mensagem: "Tarefa criada com sucesso",
+        tarefa: novaTarefa
+    }
+
+}
 
 export {
     listarTarefasService,
-    buscarTarefaPorIdService
+    buscarTarefaPorIdService,
+    cadastrarTarefaService
 }
