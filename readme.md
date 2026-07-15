@@ -1,23 +1,32 @@
 # TaskFlow API
 
-API REST para gerenciamento de tarefas, desenvolvida com Node.js e Express.
+API REST para gerenciamento de tarefas, desenvolvida com Node.js, Express e JavaScript.
 
-O projeto aplica arquitetura em camadas, validação de dados, persistência em arquivo JSON e boas práticas de versionamento com Git.
+O projeto aplica arquitetura em camadas, validação e normalização de dados, persistência em arquivo JSON e boas práticas de versionamento com Git e GitHub.
 
-## Tecnologias utilizadas
+## Tecnologias e ferramentas
 
-<p>
-  <img src="https://skillicons.dev/icons?i=js,nodejs,express,postman" alt="Tecnologias utilizadas" />
-</p>
+![JAVASCRIPT](https://img.shields.io/badge/JavaScript-000000?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
+![NODEJS](https://img.shields.io/badge/Node.js-000000?style=for-the-badge&logo=nodedotjs&logoColor=339933)
+![EXPRESS](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![POSTMAN](https://img.shields.io/badge/Postman-000000?style=for-the-badge&logo=postman&logoColor=FF6C37)
+![GIT](https://img.shields.io/badge/Git-000000?style=for-the-badge&logo=git&logoColor=F05032)
+![GITHUB](https://img.shields.io/badge/GitHub-000000?style=for-the-badge&logo=github&logoColor=white)
+![VSCODE](https://img.shields.io/badge/VS_Code-000000?style=for-the-badge&logo=visualstudiocode&logoColor=007ACC)
 
 ## Funcionalidades
 
 - Listar todas as tarefas
 - Buscar uma tarefa por ID
 - Cadastrar uma nova tarefa
+- Atualizar parcialmente uma tarefa
+- Marcar uma tarefa como concluída
+- Reabrir uma tarefa concluída
+- Excluir uma tarefa
 - Validar e normalizar os dados recebidos
 - Gerar ID e data de criação automaticamente
 - Persistir os dados em arquivo JSON
+- Retornar status HTTP adequados para cada situação
 
 ## Arquitetura
 
@@ -25,17 +34,21 @@ O projeto está organizado em camadas:
 
 ```text
 Route
-→ Controller
-→ Service
-→ Repository
-→ Database
+  ↓
+Controller
+  ↓
+Service
+  ↓
+Repository
+  ↓
+Database
 ```
 
 - **Routes:** definem os métodos e caminhos da API.
 - **Controllers:** recebem as requisições e definem as respostas HTTP.
-- **Services:** concentram validações e regras de negócio.
+- **Services:** concentram as validações e regras de negócio.
 - **Repositories:** realizam a leitura e escrita dos dados.
-- **Database:** armazena temporariamente as tarefas em JSON.
+- **Database:** armazena temporariamente as tarefas em um arquivo JSON.
 
 ## Estrutura do projeto
 
@@ -65,10 +78,10 @@ taskflow-api/
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/nykthedev/taskflow-api
+git clone https://github.com/nykthedev/taskflow-api.git
 ```
 
-### 2. Entre na pasta
+### 2. Entre na pasta do projeto
 
 ```bash
 cd taskflow-api
@@ -99,6 +112,10 @@ http://localhost:3333
 | `GET` | `/tarefas` | Lista todas as tarefas |
 | `GET` | `/tarefas/:id` | Busca uma tarefa pelo ID |
 | `POST` | `/tarefas` | Cadastra uma nova tarefa |
+| `PATCH` | `/tarefas/:id` | Atualiza parcialmente uma tarefa |
+| `PATCH` | `/tarefas/:id/concluir` | Marca uma tarefa como concluída |
+| `PATCH` | `/tarefas/:id/reabrir` | Reabre uma tarefa concluída |
+| `DELETE` | `/tarefas/:id` | Exclui uma tarefa |
 
 ## Cadastrar uma tarefa
 
@@ -142,6 +159,72 @@ A descrição é opcional:
 }
 ```
 
+## Atualizar uma tarefa
+
+```http
+PATCH /tarefas/1
+```
+
+Somente os campos enviados serão atualizados:
+
+```json
+{
+  "titulo": "Estudar Express avançado",
+  "prioridade": "alta"
+}
+```
+
+## Concluir uma tarefa
+
+```http
+PATCH /tarefas/1/concluir
+```
+
+A tarefa passa a ter:
+
+```json
+{
+  "concluida": true
+}
+```
+
+## Reabrir uma tarefa
+
+```http
+PATCH /tarefas/1/reabrir
+```
+
+A tarefa passa a ter:
+
+```json
+{
+  "concluida": false
+}
+```
+
+## Excluir uma tarefa
+
+```http
+DELETE /tarefas/1
+```
+
+### Resposta de sucesso
+
+```json
+{
+  "sucesso": true,
+  "mensagem": "Tarefa deletada com sucesso",
+  "tarefaRemovida": {
+    "id": 1,
+    "titulo": "Estudar Node.js",
+    "descricao": "Praticar desenvolvimento de APIs",
+    "prioridade": "alta",
+    "concluida": false,
+    "criadoEm": "2026-07-15T02:58:27.708Z"
+  }
+}
+```
+
 ## Regras de negócio
 
 ### Título
@@ -149,6 +232,7 @@ A descrição é opcional:
 - Obrigatório
 - Deve ser uma string
 - Não pode conter apenas espaços
+- É normalizado antes de ser salvo
 
 ### Descrição
 
@@ -166,13 +250,15 @@ media
 alta
 ```
 
-Os dados são normalizados antes do salvamento. Por exemplo:
+A prioridade é normalizada antes do salvamento:
 
 ```text
 "  ALTA  " → "alta"
 ```
 
 ### Campos gerados pela API
+
+Os seguintes campos são definidos automaticamente:
 
 - `id`
 - `concluida`
@@ -192,25 +278,27 @@ Toda nova tarefa é criada com:
 |---|---|
 | `200 OK` | Operação realizada com sucesso |
 | `201 Created` | Tarefa criada com sucesso |
-| `400 Bad Request` | Dados inválidos |
+| `400 Bad Request` | Dados ou identificador inválidos |
 | `404 Not Found` | Tarefa não encontrada |
+| `409 Conflict` | A operação entra em conflito com o estado atual da tarefa |
 | `500 Internal Server Error` | Erro interno da aplicação |
 
-## Próximas funcionalidades
+## Próximas melhorias
 
-- Atualização parcial de tarefas
-- Conclusão e reabertura de tarefas
-- Exclusão de tarefas
 - Filtros por prioridade e status
 - Tratamento centralizado de erros
+- Middlewares personalizados
 - Testes automatizados
-- Banco de dados
-- Deploy
+- Integração com banco de dados
+- Autenticação e autorização
+- Deploy da aplicação
 
-## Status
+## Status do projeto
 
-🚧 Em desenvolvimento.
+✅ Primeira versão funcional concluída.
+
+O projeto continuará sendo evoluído com novos recursos e melhorias na arquitetura.
 
 ## Autor
 
-Desenvolvido por Nicollas.
+Desenvolvido por [Nicollas](https://github.com/nykthedev).
