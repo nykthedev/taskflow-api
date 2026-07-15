@@ -147,8 +147,142 @@ function cadastrarTarefaService(dados) {
 
 }
 
+function atualizarTarefaService(id, dados) {
+    if(!Number.isInteger(id) || id <= 0) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Id inválido"
+        }
+    }
+
+    if(typeof dados !== "object" || Array.isArray(dados)) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Formato inválido"
+        }
+    }
+
+    const tarefas = lerTarefas();
+
+    const tarefaEncontrada = tarefas.find(tarefa => {
+        return tarefa.id === id;
+    })
+
+    if(!tarefaEncontrada) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_NAO_ENCONTRADA",
+            mensagem: "Tarefa não encontrada"
+        }
+    }
+
+    const {titulo, descricao, prioridade} = dados;
+
+    const tituloEnviado = typeof titulo !== "undefined";
+    const descricaoEnviada = typeof descricao !== "undefined";
+    const prioridadeEnviada = typeof prioridade!== "undefined";
+
+    let tituloNormalizado;
+    let descricaoNormalizada;
+    let prioridadeNormalizada;
+
+    if(!tituloEnviado && !descricaoEnviada && !prioridadeEnviada) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Nenhum dado válido foi enviado"
+        }
+    }
+
+    if(tituloEnviado) {
+        if(typeof titulo !== "string") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "Titulo inválido"
+            }
+        }
+
+        tituloNormalizado = titulo.trim();
+
+        if(tituloNormalizado === "") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "Titulo não pode estar vazio"
+            }
+        }
+
+    }
+
+    if(descricaoEnviada) {
+        if(typeof descricao !== "string") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "descrição inválida"
+            }
+        }
+
+        descricaoNormalizada = descricao.trim();
+    }
+
+    if(prioridadeEnviada) {
+        if(typeof prioridade !== "string") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "prioridade inválida"
+            }
+        }
+
+        prioridadeNormalizada = prioridade.trim().toLowerCase();
+
+        if(prioridadeNormalizada === "") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "Prioridade não pode estar vazio"
+            }
+        }
+
+        if(prioridadeNormalizada !== "baixa" && prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
+            return {
+                sucesso: false,
+                tipoErro: "DADOS_INVALIDOS",
+                mensagem: "Tipo de prioridade inválida"
+            }
+        }
+
+    }
+
+    if(tituloEnviado) {
+        tarefaEncontrada.titulo = tituloNormalizado;
+    }
+
+    if(descricaoEnviada) {
+        tarefaEncontrada.descricao = descricaoNormalizada;
+    }
+
+    if(prioridadeEnviada) {
+        tarefaEncontrada.prioridade = prioridadeNormalizada;
+    }
+
+    salvarTarefas(tarefas);
+
+    return {
+        sucesso: true,
+        mensagem: "Tarefa atualizada com sucesso",
+        tarefa: tarefaEncontrada
+    }
+
+}
+
 export {
     listarTarefasService,
     buscarTarefaPorIdService,
-    cadastrarTarefaService
+    cadastrarTarefaService,
+    atualizarTarefaService
 }

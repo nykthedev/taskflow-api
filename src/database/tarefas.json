@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "titulo": "Estudar Express",
-    "descricao": "Praticar cadastro de tarefas",
+    "titulo": "Estudar Node",
+    "descricao": "Revisar módulos",
     "prioridade": "alta",
     "concluida": false,
     "criadoEm": "2026-07-15T02:25:14.387Z"
