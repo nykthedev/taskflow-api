@@ -365,11 +365,48 @@ function reabrirTarefaService(id) {
 
 }
 
+function deletarTarefaService(id) {
+    if(!Number.isInteger(id) || id <= 0) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Id inválido"
+        }
+    }
+
+    const tarefas = lerTarefas();
+
+    const tarefaEncontrada = tarefas.find(tarefa => {
+        return tarefa.id === id;
+    })
+
+    if(!tarefaEncontrada) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_NAO_ENCONTRADA",
+            mensagem: "Tarefa não encontrada"
+        }
+    }
+
+    const novaLista = tarefas.filter(tarefa => {
+        return tarefa.id !== tarefaEncontrada.id
+    })
+
+    salvarTarefas(novaLista);
+
+    return {
+        sucesso: true,
+        mensagem: "Tarefa deletada com sucesso",
+        tarefaRemovida: tarefaEncontrada
+    }
+}
+
 export {
     listarTarefasService,
     buscarTarefaPorIdService,
     cadastrarTarefaService,
     atualizarTarefaService,
     concluirTarefaService,
-    reabrirTarefaService
+    reabrirTarefaService,
+    deletarTarefaService
 }
