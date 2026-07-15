@@ -1,4 +1,4 @@
-import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService } from "../services/tarefasService.js";
+import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService } from "../services/tarefasService.js";
 
 function listarTarefasController(req, res) {
 
@@ -40,8 +40,26 @@ function cadastrarTarefaController(req, res) {
     return res.status(201).json(resposta);
 }
 
+function atualizarTarefaController(req,res) {
+    const id = Number(req.params.id);
+    const dados = req.body;
+
+    const resposta = atualizarTarefaService(id, dados);
+
+    if(resposta.tipoErro === "DADOS_INVALIDOS") {
+        return res.status(400).json(resposta);
+    }
+
+    if(resposta.tipoErro === "TAREFA_NAO_ENCONTRADA") {
+        return res.status(404).json(resposta);
+    }
+
+    return res.status(200).json(resposta);
+}
+
 export {
     listarTarefasController,
     buscarTarefaPorIdController,
-    cadastrarTarefaController
+    cadastrarTarefaController,
+    atualizarTarefaController
 }
