@@ -1,4 +1,4 @@
-import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService, concluirTarefaService, reabrirTarefaService } from "../services/tarefasService.js";
+import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService, concluirTarefaService, reabrirTarefaService, deletarTarefaService } from "../services/tarefasService.js";
 
 function listarTarefasController(req, res) {
 
@@ -97,11 +97,28 @@ function reabrirTarefaController(req,res) {
     return res.status(200).json(resposta);
 }
 
+function deletarTarefaController(req,res) {
+    const id = Number(req.params.id);
+
+    const resposta = deletarTarefaService(id);
+
+    if(resposta.tipoErro === "DADOS_INVALIDOS") {
+        return res.status(400).json(resposta);
+    }
+
+    if(resposta.tipoErro === "TAREFA_NAO_ENCONTRADA") {
+        return res.status(404).json(resposta);
+    }
+
+    return res.status(200).json(resposta);
+}
+
 export {
     listarTarefasController,
     buscarTarefaPorIdController,
     cadastrarTarefaController,
     atualizarTarefaController,
     concluirTarefaController,
-    reabrirTarefaController
+    reabrirTarefaController,
+    deletarTarefaController
 }
