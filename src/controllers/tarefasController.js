@@ -1,4 +1,4 @@
-import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService } from "../services/tarefasService.js";
+import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService, concluirTarefaService } from "../services/tarefasService.js";
 
 function listarTarefasController(req, res) {
 
@@ -57,9 +57,30 @@ function atualizarTarefaController(req,res) {
     return res.status(200).json(resposta);
 }
 
+function concluirTarefaController(req,res) {
+    const id = Number(req.params.id);
+    
+    const resposta = concluirTarefaService(id);
+
+    if(resposta.tipoErro === "DADOS_INVALIDOS") {
+        return res.status(400).json(resposta);
+    }
+
+    if(resposta.tipoErro === "TAREFA_NAO_ENCONTRADA") {
+        return res.status(404).json(resposta);
+    }
+
+    if(resposta.tipoErro === "TAREFA_JA_CONCLUIDA") {
+        return res.status(409).json(resposta);
+    }
+
+    return res.status(200).json(resposta);
+}
+
 export {
     listarTarefasController,
     buscarTarefaPorIdController,
     cadastrarTarefaController,
-    atualizarTarefaController
+    atualizarTarefaController,
+    concluirTarefaController
 }

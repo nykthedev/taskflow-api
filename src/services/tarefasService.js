@@ -280,9 +280,52 @@ function atualizarTarefaService(id, dados) {
 
 }
 
+function concluirTarefaService(id) {
+    if(!Number.isInteger(id) || id <= 0) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem:"Id inválido"
+        }
+    }
+
+    const tarefas = lerTarefas();
+
+    const tarefaEncontrada = tarefas.find(tarefa => {
+        return tarefa.id === id;
+    })
+
+    if(!tarefaEncontrada) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_NAO_ENCONTRADA",
+            mensagem: "Tarfa não encontrada"
+        }
+    }
+
+    if(tarefaEncontrada.concluida) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_JA_CONCLUIDA",
+            mensagem: "Tarefa já está concluida"
+        }
+    }
+
+    tarefaEncontrada.concluida = true;
+
+    salvarTarefas(tarefas);
+
+    return {
+        sucesso: true,
+        mensagem: "Tarefa concluída com sucesso",
+        tarefa: tarefaEncontrada
+    }
+}
+
 export {
     listarTarefasService,
     buscarTarefaPorIdService,
     cadastrarTarefaService,
-    atualizarTarefaService
+    atualizarTarefaService,
+    concluirTarefaService
 }
