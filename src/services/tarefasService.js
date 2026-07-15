@@ -322,10 +322,54 @@ function concluirTarefaService(id) {
     }
 }
 
+function reabrirTarefaService(id) {
+    if(!Number.isInteger(id) || id <= 0) {
+        return {
+            sucesso: false,
+            tipoErro: "DADOS_INVALIDOS",
+            mensagem: "Id inválido"
+        }
+    }
+
+    const tarefas = lerTarefas();
+
+    const tarefaEncontrada = tarefas.find(tarefa => {
+        return tarefa.id === id;
+    });
+
+    if(!tarefaEncontrada) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_NAO_ENCONTRADA",
+            mensagem: "Tarefa não encontrada"
+        }
+    }
+
+    if(!tarefaEncontrada.concluida) {
+        return {
+            sucesso: false,
+            tipoErro: "TAREFA_JA_ABERTA",
+            mensagem: "Tarefa já está aberta"
+        }
+    }
+
+    tarefaEncontrada.concluida = false;
+
+    salvarTarefas(tarefas);
+
+    return {
+        sucesso: true,
+        mensagem: "Tarefa aberta com sucesso",
+        tarefa: tarefaEncontrada
+    }
+
+}
+
 export {
     listarTarefasService,
     buscarTarefaPorIdService,
     cadastrarTarefaService,
     atualizarTarefaService,
-    concluirTarefaService
+    concluirTarefaService,
+    reabrirTarefaService
 }
