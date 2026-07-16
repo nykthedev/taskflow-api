@@ -2,9 +2,13 @@ import express from "express";
 
 import { tarefasRouter } from "./routes/tarefasRoutes.js";
 
+import { registrarRequisicao } from "./middlewares/registrarRequisicao.js";
+
 const app = express();
 
 app.use(express.json());
+
+app.use(registrarRequisicao);
 
 app.get("/", (req,res) => {
     return res.send("Hello World");
