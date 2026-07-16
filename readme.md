@@ -93,7 +93,14 @@ cd taskflow-api
 npm install
 ```
 
-### 4. Inicie o servidor
+### 4. Configure as variáveis de ambiente
+
+Crie o arquivo `.env` usando o `.env.example` como referência:
+
+``env
+PORT=3333
+
+### 5. Inicie o servidor
 
 ```bash
 npm run dev
