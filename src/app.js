@@ -2,6 +2,7 @@ import express from "express";
 import { tarefasRouter } from "./routes/tarefasRoutes.js";
 import { registrarRequisicao } from "./middlewares/registrarRequisicao.js";
 import { rotaNaoEncontrada } from "./middlewares/rotaNaoEncontrada.js";
+import { tratarErros } from "./middlewares/tratarErros.js";
 
 const app = express();
 
@@ -16,5 +17,7 @@ app.get("/", (req,res) => {
 app.use("/tarefas", tarefasRouter);
 
 app.use(rotaNaoEncontrada);
+
+app.use(tratarErros);
 
 export default app;
