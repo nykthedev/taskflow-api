@@ -36,7 +36,7 @@ function buscarTarefaPorIdService(id) {
     if(!tarefaEncontrada) {
         return {
             sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADO",
+            tipoErro: "TAREFA_NAO_ENCONTRADA",
             mensagem: "Tarefa não encontrada"
         }
     }
