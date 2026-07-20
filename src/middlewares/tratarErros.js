@@ -1,20 +1,14 @@
+import { ErroAplicacao } from "../errors/ErroAplicacao.js";
+
 function tratarErros(erro, request, response, next) {
-    if(erro.tipoErro === "DADOS_INVALIDOS") {
-        return response.status(400).json(erro)
-    }
 
-    if(erro.tipoErro === "TAREFA_NAO_ENCONTRADA") {
-        return response.status(404).json(erro);
+    if(erro instanceof ErroAplicacao) {
+        return response.status(erro.statusCode).json({
+            sucesso: false,
+            tipoErro: erro.tipoErro,
+            mensagem: erro.message
+        })
     }
-
-    if(erro.tipoErro === "TAREFA_JA_CONCLUIDA") {
-        return response.status(409).json(erro);
-    }
-
-    if(erro.tipoErro === "TAREFA_JA_ABERTA") {
-        return response.status(409).json(erro);
-    }
-
 
     return response.status(500).json({
         sucesso: false,
