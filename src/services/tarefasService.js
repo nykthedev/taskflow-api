@@ -1,4 +1,5 @@
 import { lerTarefas, salvarTarefas } from "../repositories/tarefasRepository.js";
+import { ErroAplicacao } from "../errors/ErroAplicacao.js";
 
 function listarTarefasService() {
     const tarefas = lerTarefas();
@@ -20,11 +21,7 @@ function listarTarefasService() {
 
 function buscarTarefaPorIdService(id) {
     if(!Number.isInteger(id) || id <= 0) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Id inválido"
-        }
+        throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
     const tarefas = lerTarefas();
@@ -34,11 +31,7 @@ function buscarTarefaPorIdService(id) {
     })
 
     if(!tarefaEncontrada) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADA",
-            mensagem: "Tarefa não encontrada"
-        }
+        throw new ErroAplicacao("Tarefa não encontrada", "TAREFA_NAO_ENCONTRADA", 404);
     }
 
     return {
@@ -49,25 +42,20 @@ function buscarTarefaPorIdService(id) {
 }
 
 function cadastrarTarefaService(dados) {
+    if(dados === null || typeof dados !== "object" || Array.isArray(dados)) {
+        throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
+    }
 
     const { titulo, descricao, prioridade } = dados;
 
     if(typeof titulo !== "string" ||  typeof prioridade !== "string") {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Dados inválidos"
-        }
+        throw new ErroAplicacao("Dados inválidos", "DADOS_INVALIDOS", 400);
     }
 
     const descricaoEnviada = typeof descricao !== "undefined";
 
     if(descricaoEnviada && typeof descricao !== "string") {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Descrição inválida"
-        };
+        throw new ErroAplicacao("Descrição inválida", "DADOS_INVALIDOS", 400);
     }
     
 
@@ -79,11 +67,7 @@ function cadastrarTarefaService(dados) {
 
     
     if(tituloNormalizado === "") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "Campo titulo vazio"
-            }
+        throw new ErroAplicacao("Campo titulo vazio", "DADOS_INVALIDOS", 400);
     }
 
     if(descricaoEnviada){
@@ -93,23 +77,14 @@ function cadastrarTarefaService(dados) {
     }
 
     if(prioridadeNormalizada === "") {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Campo prioridade vazio"
-        }
+        throw new ErroAplicacao("Campo prioridade vazio", "DADOS_INVALIDOS", 400);
     }
 
     if(prioridadeNormalizada !== "baixa" &&  prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Tipo de prioridade inválida"
-        }
+        throw new ErroAplicacao("Tipo de prioridade inválida", "DADOS_INVALIDOS" , 400);
     }
 
     const tarefas = lerTarefas();
-
 
     let maiorId = 0;
 
@@ -149,19 +124,11 @@ function cadastrarTarefaService(dados) {
 
 function atualizarTarefaService(id, dados) {
     if(!Number.isInteger(id) || id <= 0) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Id inválido"
-        }
+        throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    if(typeof dados !== "object" || Array.isArray(dados)) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Formato inválido"
-        }
+    if(dados === null || typeof dados !== "object" || Array.isArray(dados)) {
+        throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
     }
 
     const tarefas = lerTarefas();
@@ -171,11 +138,7 @@ function atualizarTarefaService(id, dados) {
     })
 
     if(!tarefaEncontrada) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADA",
-            mensagem: "Tarefa não encontrada"
-        }
+        throw new ErroAplicacao("Tarefa não encontrada", "TAREFA_NAO_ENCONTRADA", 404);
     }
 
     const {titulo, descricao, prioridade} = dados;
@@ -189,41 +152,25 @@ function atualizarTarefaService(id, dados) {
     let prioridadeNormalizada;
 
     if(!tituloEnviado && !descricaoEnviada && !prioridadeEnviada) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Nenhum dado válido foi enviado"
-        }
+        throw new ErroAplicacao("Nenhum dado válido foi enviado", "DADOS_INVALIDOS", 400);
     }
 
     if(tituloEnviado) {
         if(typeof titulo !== "string") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "Titulo inválido"
-            }
+            throw new ErroAplicacao("Titulo inválido", "DADOS_INVALIDOS", 400);
         }
 
         tituloNormalizado = titulo.trim();
 
         if(tituloNormalizado === "") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "Titulo não pode estar vazio"
-            }
+            throw new ErroAplicacao("Titulo não pode estar vazio", "DADOS_INVALIDOS", 400);
         }
 
     }
 
     if(descricaoEnviada) {
         if(typeof descricao !== "string") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "descrição inválida"
-            }
+            throw new ErroAplicacao("descrição inválida", "DADOS_INVALIDOS", 400);
         }
 
         descricaoNormalizada = descricao.trim();
@@ -231,29 +178,17 @@ function atualizarTarefaService(id, dados) {
 
     if(prioridadeEnviada) {
         if(typeof prioridade !== "string") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "prioridade inválida"
-            }
+            throw new ErroAplicacao("prioridade inválida", "DADOS_INVALIDOS", 400);
         }
 
         prioridadeNormalizada = prioridade.trim().toLowerCase();
 
         if(prioridadeNormalizada === "") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "Prioridade não pode estar vazio"
-            }
+            throw new ErroAplicacao("Prioridade não pode estar vazio", "DADOS_INVALIDOS", 400);
         }
 
         if(prioridadeNormalizada !== "baixa" && prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
-            return {
-                sucesso: false,
-                tipoErro: "DADOS_INVALIDOS",
-                mensagem: "Tipo de prioridade inválida"
-            }
+            throw new ErroAplicacao("Tipo de prioridade inválida", "DADOS_INVALIDOS", 400);
         }
 
     }
@@ -282,11 +217,7 @@ function atualizarTarefaService(id, dados) {
 
 function concluirTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem:"Id inválido"
-        }
+        throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
     const tarefas = lerTarefas();
@@ -296,19 +227,11 @@ function concluirTarefaService(id) {
     })
 
     if(!tarefaEncontrada) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADA",
-            mensagem: "Tarfa não encontrada"
-        }
+        throw new ErroAplicacao("Tarefa não encontrada", "TAREFA_NAO_ENCONTRADA", 404);
     }
 
     if(tarefaEncontrada.concluida) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_JA_CONCLUIDA",
-            mensagem: "Tarefa já está concluida"
-        }
+        throw new ErroAplicacao("Tarefa já está concluida", "TAREFA_JA_CONCLUIDA", 409);
     }
 
     tarefaEncontrada.concluida = true;
@@ -324,11 +247,7 @@ function concluirTarefaService(id) {
 
 function reabrirTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Id inválido"
-        }
+        throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
     const tarefas = lerTarefas();
@@ -338,19 +257,11 @@ function reabrirTarefaService(id) {
     });
 
     if(!tarefaEncontrada) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADA",
-            mensagem: "Tarefa não encontrada"
-        }
+        throw new ErroAplicacao("Tarefa não encontrada", "TAREFA_NAO_ENCONTRADA", 404);
     }
 
     if(!tarefaEncontrada.concluida) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_JA_ABERTA",
-            mensagem: "Tarefa já está aberta"
-        }
+        throw new ErroAplicacao("Tarefa já está aberta", "TAREFA_JA_ABERTA", 409);
     }
 
     tarefaEncontrada.concluida = false;
@@ -367,11 +278,7 @@ function reabrirTarefaService(id) {
 
 function deletarTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
-        return {
-            sucesso: false,
-            tipoErro: "DADOS_INVALIDOS",
-            mensagem: "Id inválido"
-        }
+        throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
     const tarefas = lerTarefas();
@@ -381,11 +288,7 @@ function deletarTarefaService(id) {
     })
 
     if(!tarefaEncontrada) {
-        return {
-            sucesso: false,
-            tipoErro: "TAREFA_NAO_ENCONTRADA",
-            mensagem: "Tarefa não encontrada"
-        }
+        throw new ErroAplicacao("Tarefa não encontrada", "TAREFA_NAO_ENCONTRADA", 404);
     }
 
     const novaLista = tarefas.filter(tarefa => {

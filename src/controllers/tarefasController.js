@@ -7,77 +7,51 @@ function listarTarefasController(req, res) {
     return res.status(200).json(resposta);
 } 
 
-function buscarTarefaPorIdController(req, res, next) {
-
+function buscarTarefaPorIdController(req, res) {
     const id = Number(req.params.id);
 
     const resposta = buscarTarefaPorIdService(id);
 
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
-
     return res.status(200).json(resposta);
 }
 
-function cadastrarTarefaController(req, res, next) {
+function cadastrarTarefaController(req, res) {
     const dados = req.body;
 
     const resposta = cadastrarTarefaService(dados);
 
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
-
-
     return res.status(201).json(resposta);
 }
 
-function atualizarTarefaController(req, res, next) {
+function atualizarTarefaController(req, res) {
     const id = Number(req.params.id);
     const dados = req.body;
 
     const resposta = atualizarTarefaService(id, dados);
 
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
-
     return res.status(200).json(resposta);
 }
 
-function concluirTarefaController(req, res, next) {
+function concluirTarefaController(req, res) {
     const id = Number(req.params.id);
     
     const resposta = concluirTarefaService(id);
 
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
-
     return res.status(200).json(resposta);
 }
 
-function reabrirTarefaController(req, res, next) {
+function reabrirTarefaController(req, res) {
     const id = Number(req.params.id);
 
     const resposta = reabrirTarefaService(id);
 
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
-
     return res.status(200).json(resposta);
 }
 
-function deletarTarefaController(req, res, next) {
+function deletarTarefaController(req, res) {
     const id = Number(req.params.id);
 
     const resposta = deletarTarefaService(id);
-
-    if (!resposta.sucesso) {
-        return next(resposta);
-    }
 
     return res.status(200).json(resposta);
 }
