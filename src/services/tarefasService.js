@@ -1,8 +1,8 @@
 import { lerTarefas, salvarTarefas } from "../repositories/tarefasRepository.js";
 import { ErroAplicacao } from "../errors/ErroAplicacao.js";
 
-function listarTarefasService() {
-    const tarefas = lerTarefas();
+async function listarTarefasService() {
+    const tarefas = await lerTarefas();
 
     if(tarefas.length === 0) {
         return {
@@ -19,12 +19,12 @@ function listarTarefasService() {
     }
 }
 
-function buscarTarefaPorIdService(id) {
+async function buscarTarefaPorIdService(id) {
     if(!Number.isInteger(id) || id <= 0) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     const tarefaEncontrada = tarefas.find(tarefa => {
         return tarefa.id === id;
@@ -41,7 +41,7 @@ function buscarTarefaPorIdService(id) {
     }
 }
 
-function cadastrarTarefaService(dados) {
+async function cadastrarTarefaService(dados) {
     if(dados === null || typeof dados !== "object" || Array.isArray(dados)) {
         throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
     }
@@ -84,7 +84,7 @@ function cadastrarTarefaService(dados) {
         throw new ErroAplicacao("Tipo de prioridade inválida", "DADOS_INVALIDOS" , 400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     let maiorId = 0;
 
@@ -112,7 +112,7 @@ function cadastrarTarefaService(dados) {
 
     tarefas.push(novaTarefa);
 
-    salvarTarefas(tarefas);
+    await salvarTarefas(tarefas);
 
     return {
         sucesso: true,
@@ -122,7 +122,7 @@ function cadastrarTarefaService(dados) {
 
 }
 
-function atualizarTarefaService(id, dados) {
+async function atualizarTarefaService(id, dados) {
     if(!Number.isInteger(id) || id <= 0) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
@@ -131,7 +131,7 @@ function atualizarTarefaService(id, dados) {
         throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     const tarefaEncontrada = tarefas.find(tarefa => {
         return tarefa.id === id;
@@ -205,7 +205,7 @@ function atualizarTarefaService(id, dados) {
         tarefaEncontrada.prioridade = prioridadeNormalizada;
     }
 
-    salvarTarefas(tarefas);
+    await salvarTarefas(tarefas);
 
     return {
         sucesso: true,
@@ -215,12 +215,12 @@ function atualizarTarefaService(id, dados) {
 
 }
 
-function concluirTarefaService(id) {
+async function concluirTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     const tarefaEncontrada = tarefas.find(tarefa => {
         return tarefa.id === id;
@@ -236,7 +236,7 @@ function concluirTarefaService(id) {
 
     tarefaEncontrada.concluida = true;
 
-    salvarTarefas(tarefas);
+    await salvarTarefas(tarefas);
 
     return {
         sucesso: true,
@@ -245,12 +245,12 @@ function concluirTarefaService(id) {
     }
 }
 
-function reabrirTarefaService(id) {
+async function reabrirTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     const tarefaEncontrada = tarefas.find(tarefa => {
         return tarefa.id === id;
@@ -266,7 +266,7 @@ function reabrirTarefaService(id) {
 
     tarefaEncontrada.concluida = false;
 
-    salvarTarefas(tarefas);
+    await salvarTarefas(tarefas);
 
     return {
         sucesso: true,
@@ -276,12 +276,12 @@ function reabrirTarefaService(id) {
 
 }
 
-function deletarTarefaService(id) {
+async function deletarTarefaService(id) {
     if(!Number.isInteger(id) || id <= 0) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    const tarefas = lerTarefas();
+    const tarefas = await lerTarefas();
 
     const tarefaEncontrada = tarefas.find(tarefa => {
         return tarefa.id === id;
@@ -295,7 +295,7 @@ function deletarTarefaService(id) {
         return tarefa.id !== tarefaEncontrada.id
     })
 
-    salvarTarefas(novaLista);
+    await salvarTarefas(novaLista);
 
     return {
         sucesso: true,

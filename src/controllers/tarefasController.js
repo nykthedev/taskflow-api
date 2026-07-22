@@ -1,57 +1,57 @@
 import { listarTarefasService, buscarTarefaPorIdService, cadastrarTarefaService, atualizarTarefaService, concluirTarefaService, reabrirTarefaService, deletarTarefaService } from "../services/tarefasService.js";
 
-function listarTarefasController(req, res) {
+async function listarTarefasController(req, res) {
 
-    const resposta = listarTarefasService();
+    const resposta = await listarTarefasService();
 
     return res.status(200).json(resposta);
 } 
 
-function buscarTarefaPorIdController(req, res) {
+async function buscarTarefaPorIdController(req, res) {
     const id = Number(req.params.id);
 
-    const resposta = buscarTarefaPorIdService(id);
+    const resposta = await buscarTarefaPorIdService(id);
 
     return res.status(200).json(resposta);
 }
 
-function cadastrarTarefaController(req, res) {
+async function cadastrarTarefaController(req, res) {
     const dados = req.body;
 
-    const resposta = cadastrarTarefaService(dados);
+    const resposta = await cadastrarTarefaService(dados);
 
     return res.status(201).json(resposta);
 }
 
-function atualizarTarefaController(req, res) {
+async function atualizarTarefaController(req, res) {
     const id = Number(req.params.id);
     const dados = req.body;
 
-    const resposta = atualizarTarefaService(id, dados);
+    const resposta = await atualizarTarefaService(id, dados);
 
     return res.status(200).json(resposta);
 }
 
-function concluirTarefaController(req, res) {
+async function concluirTarefaController(req, res) {
     const id = Number(req.params.id);
     
-    const resposta = concluirTarefaService(id);
+    const resposta = await concluirTarefaService(id);
 
     return res.status(200).json(resposta);
 }
 
-function reabrirTarefaController(req, res) {
+async function reabrirTarefaController(req, res) {
     const id = Number(req.params.id);
 
-    const resposta = reabrirTarefaService(id);
+    const resposta = await reabrirTarefaService(id);
 
     return res.status(200).json(resposta);
 }
 
-function deletarTarefaController(req, res) {
+async function deletarTarefaController(req, res) {
     const id = Number(req.params.id);
 
-    const resposta = deletarTarefaService(id);
+    const resposta = await deletarTarefaService(id);
 
     return res.status(200).json(resposta);
 }
