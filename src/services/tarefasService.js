@@ -42,47 +42,7 @@ async function buscarTarefaPorIdService(id) {
 }
 
 async function cadastrarTarefaService(dados) {
-    if(dados === null || typeof dados !== "object" || Array.isArray(dados)) {
-        throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
-    }
-
-    const { titulo, descricao, prioridade } = dados;
-
-    if(typeof titulo !== "string" ||  typeof prioridade !== "string") {
-        throw new ErroAplicacao("Dados inválidos", "DADOS_INVALIDOS", 400);
-    }
-
-    const descricaoEnviada = typeof descricao !== "undefined";
-
-    if(descricaoEnviada && typeof descricao !== "string") {
-        throw new ErroAplicacao("Descrição inválida", "DADOS_INVALIDOS", 400);
-    }
-    
-
-    const tituloNormalizado = titulo.trim();
-
-    let descricaoNormalizada;
-
-    const prioridadeNormalizada = prioridade.trim().toLowerCase();
-
-    
-    if(tituloNormalizado === "") {
-        throw new ErroAplicacao("Campo titulo vazio", "DADOS_INVALIDOS", 400);
-    }
-
-    if(descricaoEnviada){
-        descricaoNormalizada = descricao.trim();
-    }else{
-         descricaoNormalizada = "";
-    }
-
-    if(prioridadeNormalizada === "") {
-        throw new ErroAplicacao("Campo prioridade vazio", "DADOS_INVALIDOS", 400);
-    }
-
-    if(prioridadeNormalizada !== "baixa" &&  prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
-        throw new ErroAplicacao("Tipo de prioridade inválida", "DADOS_INVALIDOS" , 400);
-    }
+    const { titulo, descricao = "", prioridade } = dados;
 
     const tarefas = await lerTarefas();
 
@@ -94,7 +54,6 @@ async function cadastrarTarefaService(dados) {
         }
     });
 
-
     const proximoId = maiorId + 1;
 
     const concluida = false;
@@ -103,10 +62,10 @@ async function cadastrarTarefaService(dados) {
 
     const novaTarefa = {
         id: proximoId,
-        titulo: tituloNormalizado,
-        descricao: descricaoNormalizada,
-        prioridade: prioridadeNormalizada,
-        concluida: concluida,
+        titulo,
+        descricao,
+        prioridade,
+        concluida,
         criadoEm: dataDeCriacao
     }
 
@@ -127,9 +86,6 @@ async function atualizarTarefaService(id, dados) {
         throw new ErroAplicacao("Id inválido", "DADOS_INVALIDOS", 400);
     }
 
-    if(dados === null || typeof dados !== "object" || Array.isArray(dados)) {
-        throw new ErroAplicacao("Formato inválido","DADOS_INVALIDOS",400);
-    }
 
     const tarefas = await lerTarefas();
 
@@ -143,68 +99,17 @@ async function atualizarTarefaService(id, dados) {
 
     const {titulo, descricao, prioridade} = dados;
 
-    const tituloEnviado = typeof titulo !== "undefined";
-    const descricaoEnviada = typeof descricao !== "undefined";
-    const prioridadeEnviada = typeof prioridade!== "undefined";
-
-    let tituloNormalizado;
-    let descricaoNormalizada;
-    let prioridadeNormalizada;
-
-    if(!tituloEnviado && !descricaoEnviada && !prioridadeEnviada) {
-        throw new ErroAplicacao("Nenhum dado válido foi enviado", "DADOS_INVALIDOS", 400);
+    if(titulo !== undefined) {
+        tarefaEncontrada.titulo = titulo;
     }
 
-    if(tituloEnviado) {
-        if(typeof titulo !== "string") {
-            throw new ErroAplicacao("Titulo inválido", "DADOS_INVALIDOS", 400);
-        }
-
-        tituloNormalizado = titulo.trim();
-
-        if(tituloNormalizado === "") {
-            throw new ErroAplicacao("Titulo não pode estar vazio", "DADOS_INVALIDOS", 400);
-        }
-
+    if(descricao !== undefined) {
+        tarefaEncontrada.descricao = descricao;
     }
 
-    if(descricaoEnviada) {
-        if(typeof descricao !== "string") {
-            throw new ErroAplicacao("descrição inválida", "DADOS_INVALIDOS", 400);
-        }
-
-        descricaoNormalizada = descricao.trim();
+    if(prioridade !== undefined) {
+        tarefaEncontrada.prioridade = prioridade;
     }
-
-    if(prioridadeEnviada) {
-        if(typeof prioridade !== "string") {
-            throw new ErroAplicacao("prioridade inválida", "DADOS_INVALIDOS", 400);
-        }
-
-        prioridadeNormalizada = prioridade.trim().toLowerCase();
-
-        if(prioridadeNormalizada === "") {
-            throw new ErroAplicacao("Prioridade não pode estar vazio", "DADOS_INVALIDOS", 400);
-        }
-
-        if(prioridadeNormalizada !== "baixa" && prioridadeNormalizada !== "media" && prioridadeNormalizada !== "alta") {
-            throw new ErroAplicacao("Tipo de prioridade inválida", "DADOS_INVALIDOS", 400);
-        }
-
-    }
-
-    if(tituloEnviado) {
-        tarefaEncontrada.titulo = tituloNormalizado;
-    }
-
-    if(descricaoEnviada) {
-        tarefaEncontrada.descricao = descricaoNormalizada;
-    }
-
-    if(prioridadeEnviada) {
-        tarefaEncontrada.prioridade = prioridadeNormalizada;
-    }
-
     await salvarTarefas(tarefas);
 
     return {
@@ -212,7 +117,6 @@ async function atualizarTarefaService(id, dados) {
         mensagem: "Tarefa atualizada com sucesso",
         tarefa: tarefaEncontrada
     }
-
 }
 
 async function concluirTarefaService(id) {

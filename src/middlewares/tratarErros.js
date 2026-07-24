@@ -6,7 +6,8 @@ function tratarErros(erro, request, response, next) {
         return response.status(erro.statusCode).json({
             sucesso: false,
             tipoErro: erro.tipoErro,
-            mensagem: erro.message
+            mensagem: erro.message,
+            detalhes: erro.detalhes
         })
     }
 
