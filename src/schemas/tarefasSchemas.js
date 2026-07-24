@@ -1,0 +1,19 @@
+import * as z from "zod";
+
+const cadastrarTarefaSchema = z.strictObject({
+    titulo: z.string().trim().min(1, "Titulo é obrigatório"),
+    descricao: z.string().trim().optional(),
+    prioridade: z.string({
+      error: (erro) => erro.input === undefined ? "Prioridade é obrigatória" 
+      : "Prioridade deve ser texto"
+    }).trim().toLowerCase().pipe(z.enum(["baixa", "media", "alta"]), {
+        error: "Prioridade inválida"
+    })
+});
+
+const atualizarTarefaSchema = cadastrarTarefaSchema.partial().refine(dados => Object.keys(dados).length > 0, {
+    error: "Envie pelo menos um campo para atualizar"
+});
+
+
+export { cadastrarTarefaSchema, atualizarTarefaSchema };
